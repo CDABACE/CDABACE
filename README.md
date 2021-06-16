@@ -1,6 +1,8 @@
 ### Hi there 👋
 
 **Cross-Domain Attribute-Based Access Control Encryption** enables to build an ACE construction from any Ciphertext-Policy Attribute-Based Encryption. 
+The code is written in python under [charm-crypto](http://charm-crypto.io/) library. This framework enables rapid prototyping of advanced cryptosystems. It uses the Python programming language from the ground up to reduce development time and complexity, and to promote reuse of components.
+
 
 The structure of this repository is as follows: 
   - Schemes 
