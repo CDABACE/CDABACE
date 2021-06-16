@@ -11,7 +11,7 @@ The structure of this repository is as follows:
     - Waters11.py: Python code for a variation of Waters's CP-ABE scheme [[2]](#2).
     - TestWaters11.py: Python code to run "Waters11.py" under a simple example.
     - PoK.py: Python code for NIZKs used in the construction.
-
+    - ZeroPoly.py: Python code for Zero-Polynomial defines in Def. 3.
 ## References
 <a id="1">[1]</a> 
 Wang, Xiuhua, and Sherman SM Chow.
