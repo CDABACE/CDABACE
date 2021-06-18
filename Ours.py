@@ -1,5 +1,4 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc, Input, Output
 from Zeropoly import Zero_poly
 from PoK import PoK
@@ -14,8 +13,8 @@ sgk_t = {'v':ZR }
 sign_t = { 'R':G1, 'S':G2, 'T':G2, 'W':G2 }
 Rand_t = { 'Rprime':G1, 'Sprime':G2, 'Tprime':G2, 'Wprime':G2, 'vkprime': G1, 'ekprime':G2}
 ctt_t = { 'Cprime':GT, 'C1prime':G1, 'C2prime':G2, 'policy':str }
+
 class CD_ABACE(ABEnc):
-         
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
