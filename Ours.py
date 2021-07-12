@@ -3,6 +3,7 @@ from charm.toolbox.ABEnc import ABEnc, Input, Output
 from Zeropoly import Zero_poly
 from PoK import PoK
 
+#List of inputs and outputs
 pk_t = { 'g_2':G1, 'h_i':G2, 'e_gg_alpha':GT, 'uni': str}
 mk_t = {'alpha':ZR, 'g':G1 }
 sk_t = { 'dk':G1, 'B':str }
@@ -15,12 +16,14 @@ Rand_t = { 'Rprime':G1, 'Sprime':G2, 'Tprime':G2, 'Wprime':G2, 'vkprime': G1, 'e
 ctt_t = { 'Cprime':GT, 'C1prime':G1, 'C2prime':G2, 'policy':str }
 
 class CD_ABACE(ABEnc):
+    # Initialze
     def __init__(self, groupObj):
         ABEnc.__init__(self)
         global util, group
         util = SecretUtil(groupObj, verbose=False)
         group = groupObj
-    
+        
+    # Receiver Authority parameter generation
     @Output(pk_t, mk_t)    
     def RAgen(self,uni_size,U):
         g, h, alpha = group.random(G1), group.random(G2), group.random(ZR)
@@ -33,7 +36,8 @@ class CD_ABACE(ABEnc):
         pk = {'g_2':g_2, 'h_i':h_i, 'e_gg_alpha':e_gg_alpha, 'uni': U}
         mk = {'alpha':alpha, 'g':g }
         return (pk, mk)
-
+    
+    # Sender Authority parameter generation
     @Input(pk_t)
     @Output(sgk_t)
     def SAgen(self, pk):
@@ -42,7 +46,8 @@ class CD_ABACE(ABEnc):
         sgk = {'v':v}
         vk = {'vk':V, 'Y':Y}
         return (sgk, vk)
-
+    
+    # Decryption key generation
     @Input(pk_t, mk_t, [str], [str])
     @Output(sk_t)
     def DecKGen(self, pk, mk, B, U):
@@ -51,7 +56,8 @@ class CD_ABACE(ABEnc):
             Zerop *= mk['alpha'] + group.hash(attrs, ZR) 
         dk = mk['g'] ** (1/Zerop)
         return { 'dk':dk, 'B':B }
-
+    
+    # Encryption key generation
     @Input(pk_t, sgk_t, vk_t, [str], [str])
     @Output(ek_t, sign_t)
     def EncKGen(self, pk, sgk, vk, P, U):
@@ -71,7 +77,8 @@ class CD_ABACE(ABEnc):
         W = pk['h_i'][0]**(1/t)
         sign={'R':R, 'S':S, 'T':T, 'W':W}
         return (ek,sign)
-
+    
+    # Encryption
     @Input(pk_t, vk_t, GT, ek_t, sign_t, [str])
     @Output(ct_t, Rand_t)
     def encrypt(self, pk, vk, M, ek, sign, P): 
@@ -90,12 +97,14 @@ class CD_ABACE(ABEnc):
         Rand = { 'Rprime':Rprime, 'Sprime':Sprime, 'Tprime':Tprime, 'Wprime':Wprime, 'vkprime': vkprime, 'ekprime':ekprime}
         return (ct,Rand)
     
-
+    
+    # Sanitization
     @Input(pk_t, vk_t, ct_t, Rand_t)
     @Output(ctt_t)
     def Sanitization(self, pk, vk, ct, Rand):
         a = []; C2prime = 1; s = group.random(ZR)
-        if pair(Rand['Rprime'],Rand['Sprime'])==pair(Rand['vkprime'],Rand['ekprime'])*pair(pk['g_2'],vk['Y']) and pair(Rand['Rprime'],Rand['Tprime'])==pair(vk['vk'],Rand['Sprime'])*pair(pk['g_2'],pk['h_i'][0]):
+        if pair(Rand['Rprime'],Rand['Sprime'])==pair(Rand['vkprime'],Rand['ekprime'])*pair(pk['g_2'],vk['Y']) and \
+        pair(Rand['Rprime'],Rand['Tprime'])==pair(vk['vk'],Rand['Sprime'])*pair(pk['g_2'],pk['h_i'][0]):
             Com_set = list(set(pk['uni']) - set(ct['policy']))
             for attrs in Com_set:
                 a.append(group.hash(attrs, ZR))
@@ -110,7 +119,8 @@ class CD_ABACE(ABEnc):
             return (ctt)
         else:
             return print("You are not allowed to write this message")
-
+    
+    # Decryption 
     @Input(pk_t, sk_t, ctt_t)
     @Output(GT)
     def decrypt(self, pk, sk, ctt):
