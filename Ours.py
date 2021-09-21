@@ -23,7 +23,7 @@ class CD_ABACE(ABEnc):
         util = SecretUtil(groupObj, verbose=False)
         group = groupObj
         
-    # Receiver Authority parameter generation
+    # Receiver Authority parameter generation phase
     @Output(pk_t, mk_t)    
     def RAgen(self,uni_size,U):
         g, h, alpha = group.random(G1), group.random(G2), group.random(ZR)
